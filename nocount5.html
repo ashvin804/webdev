@@ -156,7 +156,7 @@
 <h1>number game</h1>
 <marquee class="par">CLICK! on the numbers in ascending order in minimum posible time </marquee>
 	<button id="New">NEW GAME</button>
-	<span id="stopwatch"></span>
+	<span id="stopwatch">00:00:00</span>
 	<p><div id="pad">
 		<button class="button" id="11">11</buttom>
 		<button class="button" id="3">3</buttom>
@@ -222,90 +222,95 @@
 		  if(N>0)  {
 		document.getElementById("tom").innerHTML="<h2>your last score was </h2>";
 		
-		}}
-		
+		}
+                 st.yac.value="pause";
+                st.yac.removeEventListener("click",st.start);
+                  st.yac.addEventListener("click",st.stop);
+                 
+		}
 			
-			
-		
-			class Stopwatch {
-    constructor(display, results) {
-        this.running = false;
-        this.display = display;
-        this.results = results;
-        this.reset();
-        this.print(this.times);
-    }
+		var stopwatch = {
+  /* [INIT] */
+  etime : null, // holds HTML time display
+  erst : null, // holds HTML reset button
+  ego : null, // holds HTML start/stop button
+  timer : null, // timer object
+  now : 0, // current timer
+  estop: null,
+  init : function () {
+    // Get HTML elements
+    stopwatch.etime = document.getElementById("stopwatch");
+    stopwatch.erst = document.getElementById("New");
+    stopwatch.ego = document.getElementById("1");
+    stopwatch.estop=document.getElementById("20");
+    // Attach listeners
+    stopwatch.erst.addEventListener("click", stopwatch.reset);
     
-    reset() {
+   stopwatch.ego.addEventListener("click", stopwatch.start);
+    
+    stopwatch.estop.addEventListener("click",stopwatch.stop);
+  },
+
+  /* [ACTIONS] */
+  tick : function () {
+  // tick() : update display if stopwatch running
+
+    // Calculate hours, mins, seconds
+    stopwatch.now++;
+    var remain = stopwatch.now;
+    var hours = Math.floor(remain / 3600);
+    remain -= hours * 3600;
+    var mins = Math.floor(remain / 60);
+    remain -= mins * 60;
+    var secs = remain;
+
+    // Update the display timer
+    if (hours<10) { hours = "0" + hours; }
+    if (mins<10) { mins = "0" + mins; }
+    if (secs<10) { secs = "0" + secs; }
+    stopwatch.etime.innerHTML = hours + ":" + mins + ":" + secs;
+  },
+
+  start : function (){
+  // start() : start the stopwatch
+
        
-        this.times = [ 0, 0, 0 ];
-    }
-    
-   start() {
-        if (!this.time) this.time = performance.now();
-        if (!this.running) {
-            this.running = true;
-            requestAnimationFrame(this.step.bind(this));
-        }
-    }
-    
-    stop() {
-      
-        this.running = false;
-        this.time = null;
-    }
-    
-    step(timestamp) {
-        if (!this.running) return;
-        this.calculate(timestamp);
-        this.time = timestamp;
-        this.print();
-        requestAnimationFrame(this.step.bind(this));
-    }
-    
-    calculate(timestamp) {
-        var diff = timestamp - this.time;
-        // Hundredths of a second are 100 ms
-        this.times[2] += diff / 10;
-        // Seconds are 100 hundredths of a second
-        if (this.times[2] >= 100) {
-            this.times[1] += 1;
-            this.times[2] -= 100;
-        }
-        // Minutes are 60 seconds
-        if (this.times[1] >= 60) {
-            this.times[0] += 1;
-            this.times[1] -= 60;
-        }
-    }
-    
-    print() {
-        this.display.innerText = this.format(this.times);
-    }
-    
-    format(times) {
-        return `\
-${pad0(times[0], 2)}:\
-${pad0(times[1], 2)}:\
-${pad0(Math.floor(times[2]), 2)}`;
-    }
-}
+                        stopwatch.timer = setInterval(stopwatch.tick, 1000);
+                          
+                            stopwatch.ego.removeEventListener("click", stopwatch.start);
+			
 
-function pad0(value, count) {
-    var result = value.toString();
-    for (; result.length < count; --count)
-        result = '0' + result;
-    return result;
-}
+ },
 
-function clearChildren(node) {
-    while (node.lastChild)
-        node.removeChild(node.lastChild);
-}
+  stop  : function () {
+  // stop() : stop the stopwatch
 
-let stopwatch = new Stopwatch(
-    document.querySelector('#stopwatch'),
-    document.querySelector('#results'));			
+                             clearInterval(stopwatch.timer);
+                            stopwatch.timer = null;
+                         
+                          
+   
+ 
+ },
+
+  reset : function () {
+  // reset() : reset the stopwatch
+
+    // Stop if running
+    if (stopwatch.timer != null) { clearInterval(stopwatch.timer);
+                            stopwatch.timer = null;
+                          stopwatch.ego.addEventListener("click", stopwatch.start); }
+
+    // Reset time
+    stopwatch.now = -1;
+    stopwatch.tick();
+
+  }
+};
+
+window.addEventListener("load", stopwatch.init);	
+		
+			
 		
 		
  var st= { yac: null,
@@ -322,7 +327,8 @@ let stopwatch = new Stopwatch(
                          st.yac.removeEventListener("click",st.stop);  
 		         st.yac.addEventListener("click",st.start);
                           }},
-          start:function(){var num=document.getElementById("stopwatch").innerHTML;
+          start:function(){
+                            var num=document.getElementById("stopwatch").innerHTML;
 			    var string=num.toString();
                             if(string!=="00:00:00"){
                             stopwatch.start();
